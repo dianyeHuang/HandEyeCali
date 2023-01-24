@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<launch>
+    <!-- franka initialization -->
+    <arg name="robot_ip"  default="172.16.0.2" />
+    <arg name="launch_rviz" default="true" />
+    <arg name="load_gripper" value="false" /> 
+    <arg name="rviz_config_path" default="$(find franka_handeye_cali)/config/rviz_handeye_config.rviz"/>
+
+    <!-- If needed, broadcast static tf for robot root -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="virtual_joint_broadcaster_1" args="0 0 0 0 0 0 world panda_link0" />
+
+    <!-- initialize franka_control -->
+    <rosparam command="load" file="$(find franka_example_controllers)/config/franka_example_controllers.yaml" />
+
+    <include file="$(find franka_control)/launch/franka_control.launch">
+    <arg name="robot_ip" value="$(arg robot_ip)" />
+    <arg name="load_gripper" value="$(arg load_gripper)" />
+    </include>
+
+    <!-- Load position_joint_trajectory_controller for move_group -->
+    <node name="controller_spawner_position_joint_trajectory_controller" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="position_joint_trajectory_controller"/>
+
+    <!-- initialize move_group -->
+    <include file="$(find panda_moveit_config)/launch/move_group.launch">
+        <!-- <arg name="load_gripper" value="$(arg load_gripper)" /> -->
+    </include>
+
+    <!-- initialize rviz for visualization -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_config_path)" required="true" />
+
+</launch>

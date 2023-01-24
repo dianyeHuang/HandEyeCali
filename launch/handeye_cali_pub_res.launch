@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<launch>
+        <!-- franka initialization -->
+    <include file="$(find franka_handeye_cali)/launch/handeye_init.launch"/>
+
+    <!-- realsense initialization -->
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch" >
+        <arg name="align_depth" value="true" />
+        <arg name="filters" value="pointcloud" />
+    </include>
+
+    <!-- load eye-in-hand calibration result -->
+    <node name="gui_handeye_cali_res_node" pkg="franka_handeye_cali" type="handeye_pub_res.py" args="" required="true" />
+
+</launch>
